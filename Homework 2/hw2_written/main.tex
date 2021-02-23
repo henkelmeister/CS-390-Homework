@@ -1,0 +1,69 @@
+\documentclass{article}
+\usepackage[margin=0.5in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\mathtoolsset{showonlyrefs}
+
+\usepackage{minted}
+
+\title{CMPSCI 390A Homework 2}
+\author{\textbf{YOUR NAME HERE}}
+\date{Assigned: Feb 8 2018; Due: Feb 11 2018 @ 11:00 am ET}
+
+\begin{document}
+
+\maketitle
+
+
+\section{Derivatives of a Loss function (50 points)}
+
+For each function below, write an expression for the derivative with respect to the weight $w_j$. When deriving an answer, you may reuse the answer to a previous question if it is convenient. 
+
+
+To give you an example of what we expect for an answer and how to format it we provide the following example. 
+%
+Consider the function $g(w) = \sum_{k=1}^m a_k w_k$, where $a_k = 1$ if $k=j$ and $0$ otherwise. 
+\begin{align}
+    \frac{\partial g(w)}{\partial w_j} = & \frac{\partial}{\partial w_j} \sum_{k=1}^m a_k w_k \\
+    = & \sum_{k=1}^m \frac{\partial}{\partial w_j} a_k w_k \\
+    = & \sum_{k=1, k \ne j}^m \frac{\partial}{\partial w_j} 0 w_k + \frac{\partial}{\partial w_j} 1 w_j \\
+    = & \sum_{k=1, k \ne j}^m 0 + \frac{\partial}{\partial w_j} w_j \\
+    = & \frac{\partial}{\partial w_j} w_j \\
+    = &  1.
+\end{align}
+
+In formatting your answers, you can use the {\&} symbol to align multiple lines (see the source code for the equation block above for an example). 
+
+
+
+Write expressions for the following derivatives. 
+\begin{enumerate}
+    \item (10 points) $f_w(x_i)$
+    \begin{align}
+        \frac{\partial f_w(x_i)}{\partial w_j} = &\ % <your_answer_here>
+    \end{align}
+    
+    \item (10 points)  $l_1(w) = (y_1 - f_w(x_1))^2$
+    \begin{align}
+        \frac{\partial l_1(w)}{\partial w_j} = &\ % <your_answer_here>
+    \end{align}
+    
+    \item (10 points) $l_2(w) = \sum_{i=1}^n f_w(x_i)$
+    \begin{align}
+        \frac{\partial l_2(w)}{\partial w_j} = &\ % <your_answer_here>
+    \end{align}
+    
+    \item (20 points) $l_3(w) = \frac{1}{n}\sum_{i=1}^n (y_i - f_w(x_i))^2$
+    \begin{align}
+        \frac{\partial l_3(w)}{\partial w_j} = &\ % <your_answer_here>
+    \end{align}
+    
+\end{enumerate}
+
+
+
+\end{document}
