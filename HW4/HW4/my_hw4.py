@@ -55,8 +55,26 @@ def gradient_descent(X : np.ndarray, Y : np.ndarray, w0 : np.ndarray, alpha : fl
     """
     w = np.copy(w0)
     losses = []
-    # TODO Complete this function. Use previous homework if it was correct.
+    for i in range(num_iterations):
+        loss, g = loss_gradient(X, Y, w)
+        w = w - alpha * g
+        losses.append(loss)
+    loss = loss_function(X, Y, w)
+    losses.append(loss)
     return losses, w
+
+def loss_function(X : np.ndarray, Y : np.ndarray, w : np.ndarray)->float:
+    residuals = np.dot(X, w) - Y
+    loss = np.square(residuals).sum() * 0.5
+    return loss
+
+
+def loss_gradient(X, Y, w):
+    loss = loss_function(X, Y, w)
+    y_estimated = X.dot(w)
+    error = (y_estimated - Y)
+    g = X.T.dot(error)
+    return loss, g
 
 def learning_curve(losses: list, names : list):
     """
@@ -101,7 +119,16 @@ def polynomial_basis(X: np.ndarray, order: int):
     X2 : np.ndarray
         A 2D numpy array containing the polynomial features
     """
-    X2 = np.copy(X)  # TODO replace this line and complete the function
+    X2 = np.copy(X)
+    m, n = X.shape
+    for itter in range(2, order + 1):
+        for j in range(1, n):
+            vector = np.zeros((m, 1))
+            row = X2[:, j]
+            for i in range(m):
+                vector[i] = np.power(row[i], itter)
+            X2 = np.append(X2, vector, axis=1)
+
     return X2
 
 def fourier_basis(X: np.ndarray, order : int):
@@ -121,8 +148,17 @@ def fourier_basis(X: np.ndarray, order : int):
         A 2D numpy array containing the Fourier features
     """
     X2 = np.copy(X)  # TODO replace the line and complete the function
+    m, n = X.shape
+    for itter in range(order):
+        for j in range(n):
+            vector = np.zeros((m, 1))
+            row = X2[:, j]
+            for i in range(m):
+                vector[i] = np.cos(row[i] * itter * np.pi)
+            X2 = np.append(X2, vector, axis=1)
 
     return X2
+
 
 def add_constant(X: np.ndarray)->np.ndarray:
     """
@@ -141,8 +177,8 @@ def add_constant(X: np.ndarray)->np.ndarray:
     """
     X2 = np.copy(X)  # TODO replace this line to complete the fucntion
     m, n = np.shape(X)
-    ones = np.ones((m , 1))
-    X2 = np.append(ones,X2,axis=1)
+    ones = np.ones((m, 1))
+    X2 = np.append(ones, X2, axis=1)
     return X2
 
 def normalize_gaussian(X: np.ndarray)->np.ndarray:
@@ -159,8 +195,16 @@ def normalize_gaussian(X: np.ndarray)->np.ndarray:
     X2 : np.ndarray
         A 2D numpy array with each column normalized
     """
+
     X2 = np.copy(X)  # TODO complete this function
+    m, n = X2.shape
+    xBar = np.mean(X2, axis=0)
+    for col in range(n):
+        for row in range(m):
+            theta = np.sqrt((1/n)*np.square(X2[row][col] - xBar[col]))
+            X2[row][col] = ((X2[row][col] - xBar[col]) / theta)
     return X2
+
 
 def normalize_01(X: np.ndarray, low: np.ndarray, high: np.ndarray)->np.ndarray:
     """
@@ -181,7 +225,13 @@ def normalize_01(X: np.ndarray, low: np.ndarray, high: np.ndarray)->np.ndarray:
         A 2D numpy array with each column normalized
     """
     X2 = np.copy(X)  # TODO replace this line and complete the function
+    m, n = X2.shape
+    for col in range(n):
+        for row in range(m):
+            X2[row][col] = ((X2[row][col] - low[col]) / (high[col] - low[col]))
+
     return X2
+
 
 def normalize_posneg(X: np.ndarray, low: np.ndarray, high: np.ndarray)->np.ndarray:
     """
@@ -202,6 +252,10 @@ def normalize_posneg(X: np.ndarray, low: np.ndarray, high: np.ndarray)->np.ndarr
         A 2D numpy array with each column normalized
     """
     X2 = np.copy(X)  # TODO replace this line and complete the function
+    m, n = X2.shape
+    for col in range(n):
+        for row in range(m):
+            X2[row][col] = 2*((X2[row][col] - low[col]) / (high[col] - low[col])) - 1
     return X2
 
 
@@ -233,7 +287,8 @@ def posneg_fit(X, Y, low, high, alpha, num_iterations=10000):
     losses, wfinal = gradient_descent(X, Y, w, alpha=alpha, num_iterations=num_iterations)
     return losses
 
-def fourier_fit(X: np.ndarray, Y: np.ndarray, order: int, low: np.ndarray, high: np.ndarray, alpha: float, num_iterations:int =10000):
+
+def fourier_fit(X: np.ndarray, Y: np.ndarray, order: int, low: np.ndarray, high: np.ndarray, alpha: float, num_iterations: int =10000):
     """
     This function performs a basis expansion using fourier features. Then
     performs gradient descent to find the minimum loss value. All loss values
@@ -256,6 +311,7 @@ def fourier_fit(X: np.ndarray, Y: np.ndarray, order: int, low: np.ndarray, high:
     alpha : float
         learning rate for gradient descent
     num_iterations : int
+
         number of iterations of gradient descent
 
     Returns
@@ -263,7 +319,10 @@ def fourier_fit(X: np.ndarray, Y: np.ndarray, order: int, low: np.ndarray, high:
     losses : list
         A list of containing the loss values for gradient descent
     """
-    losses = []  # TODO Complete this function
+    X = fourier_basis(X, order)
+    X = add_constant(X)
+    w = np.zeros(X.shape[1])  # initialize the weight vector
+    losses, wfinal = gradient_descent(X, Y, w, alpha=alpha, num_iterations=num_iterations)
     return losses
 
 def polynomial_fit(X: np.ndarray, Y: np.ndarray, order: int, low: np.ndarray, high: np.ndarray, alpha: float, num_iterations:int =10000):
@@ -295,7 +354,10 @@ def polynomial_fit(X: np.ndarray, Y: np.ndarray, order: int, low: np.ndarray, hi
     losses : list
         A list of containing the loss values for gradient descent
     """
-    losses = []  # TODO complete this function
+    X = polynomial_basis(X, order)
+    X = add_constant(X)
+    w = np.zeros(X.shape[1])  # initialize the weight vector
+    losses, wfinal = gradient_descent(X, Y, w, alpha=alpha, num_iterations=num_iterations)
     return losses
 
 def main():
@@ -315,15 +377,13 @@ def main():
     porder = 2  # order for the Polynomial basis TODO tune this value
     losses4 = fourier_fit(X, Y, forder, low, high, alpha=1e-7, num_iterations=N)  # performs gradient descent on the data with fourier features added
     losses5 = polynomial_fit(X, Y, porder, low, high, alpha=1e-7, num_iterations=N)  # performs gradient descent on the data with polynomial features added
-
-
     all_losses = [losses0, losses1, losses2, losses3, losses4, losses5]
     names = ["Original", r"$\mathcal{N}(0,1)$", r"$[0,1]$", r"$[-1,1]$", "Fourier {0}".format(forder), "Poly {0}".format(porder)]
     print("final loss values")
     for name, losses in zip(names, all_losses):
-        # print("{0:.<21}{1:>8.1f}".format(name, float(losses[-1])))
+        print("{0:.<21}{1:>8.1f}".format(name, float(losses[-1])))
 
-    learning_curve(all_losses, names)
+        learning_curve(all_losses, names)
 
 
 if __name__ == "__main__":
