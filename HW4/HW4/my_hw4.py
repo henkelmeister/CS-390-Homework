@@ -119,15 +119,12 @@ def polynomial_basis(X: np.ndarray, order: int):
     X2 : np.ndarray
         A 2D numpy array containing the polynomial features
     """
-    X2 = np.copy(X)
-    m, n = X.shape
-    for itter in range(2, order + 1):
-        for j in range(1, n):
-            vector = np.zeros((m, 1))
-            row = X2[:, j]
-            for i in range(m):
-                vector[i] = np.power(row[i], itter)
-            X2 = np.append(X2, vector, axis=1)
+    d = np.arange(order) + 1
+    n, m = X.shape
+    X2 = np.power(X.reshape(n, m, 1), d.reshape(1, -1)).reshape(n, -1)
+
+
+
 
     return X2
 
@@ -195,14 +192,20 @@ def normalize_gaussian(X: np.ndarray)->np.ndarray:
     X2 : np.ndarray
         A 2D numpy array with each column normalized
     """
+    """
 
     X2 = np.copy(X)  # TODO complete this function
     m, n = X2.shape
+    
     xBar = np.mean(X2, axis=0)
     for col in range(n):
         for row in range(m):
             theta = np.sqrt((1/n)*np.square(X2[row][col] - xBar[col]))
             X2[row][col] = ((X2[row][col] - xBar[col]) / theta)
+    """
+    mu = np.mean(X)
+    sd = np.std(X)
+    X2 = (X - mu) / sd
     return X2
 
 
